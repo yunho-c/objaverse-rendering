@@ -2,6 +2,7 @@ import argparse
 import json
 import random
 from dataclasses import dataclass
+from typing import Optional
 
 import boto3
 import objaverse
@@ -11,10 +12,10 @@ from tqdm import tqdm
 
 @dataclass
 class Args:
-    start_i: int
+    start_i: Optional[int] = None
     """total number of files uploaded"""
 
-    end_i: int
+    end_i: Optional[int] = None
     """total number of files uploaded"""
 
     skip_completed: bool = False
@@ -41,14 +42,15 @@ def get_completed_uids():
 if __name__ == "__main__":
     args = tyro.cli(Args)
 
-    random.seed(42)
+    # random.seed(42)
 
     uids = objaverse.load_uids()
 
-    random.shuffle(uids)
+    # random.shuffle(uids) # NOTE: modified (yunho-c)
 
     object_paths = objaverse._load_object_paths()
-    uids = uids[args.start_i : args.end_i]
+    if args.start_i is not None and args.end_i is not None:
+        uids = uids[args.start_i : args.end_i]
 
     # get the uids that have already been downloaded
     if args.skip_completed:
